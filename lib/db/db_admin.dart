@@ -13,16 +13,16 @@ class DBAdmin {
   static final DBAdmin db = DBAdmin._();
   DBAdmin._();
 
-  checkDatabase() {
+  Future<Database?> checkDatabase() async {
     if (myDatabase != null) {
       return myDatabase;
     }
 
-    myDatabase = initBatabase(); //Crear base de datos
+    myDatabase = await initBatabase(); //Crear base de datos
     return myDatabase;
   }
 
-  initBatabase() async {
+  Future<Database> initBatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
     String path = join(directory.path, "TaskDB.db");
     return await openDatabase(
@@ -35,5 +35,38 @@ class DBAdmin {
             "CREATE TABLE TASK(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, status TEXT)");
       },
     );
+  }
+
+  insertRawTask() async {
+    Database? db = await checkDatabase();
+    int rest = await db!.rawInsert(
+      "INSERT INTO TASK(title, description, status) VALUES ('Ir de compras','comprar para la semana al mercado','false')",
+    );
+    print(rest);
+  }
+
+  insertTask() async {
+    Database? db = await checkDatabase();
+    int res = await db!.insert(
+      "TASK",
+      {
+        "title": "COmprar nuevo disco",
+        "description": "Nuevo disco de metallica",
+        "status": "ture",
+      },
+    );
+    print(res);
+  }
+
+  getRawTask() async {
+    Database? db = await checkDatabase();
+    List tasks = await db!.rawQuery("SELECT * FROM Task");
+    print(tasks);
+  }
+
+  getTask() async {
+    Database? db = await checkDatabase();
+    List tasks = await db!.query("Task");
+    print(tasks);
   }
 }
