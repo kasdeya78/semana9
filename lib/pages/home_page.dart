@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:semana9/db/db_admin.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,8 +15,12 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () {},
-              child: Text("Mostrar data"),
+              onPressed: () {
+                DBAdmin.db.initBatabase();
+              },
+              child: Text(
+                "Mostrar data",
+              ),
             )
           ],
         ),
