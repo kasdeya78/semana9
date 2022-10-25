@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:semana9/db/db_admin.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  Future<String> getFullName() async {
+    return "Eduardo Chavez";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,47 +12,26 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text("Home Page"),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                DBAdmin.db.getTask();
+      body: FutureBuilder(
+        future: DBAdmin.db.getTask(),
+        builder: (BuildContext context, AsyncSnapshot snap) {
+          if (snap.hasData) {
+            List<Map<String, dynamic>> myTask = snap.data;
+            return ListView.builder(
+              itemCount: myTask.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(myTask[index]["title"]),
+                  subtitle: Text(myTask[index]["description"]),
+                );
               },
-              child: Text(
-                "Mostrar data",
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                //DBAdmin.db.insertRawTask();
-                DBAdmin.db.insertTask();
-              },
-              child: Text(
-                "Insertar data",
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                //DBAdmin.db.insertRawTask();
-                DBAdmin.db.updateTask();
-              },
-              child: Text(
-                "Actualizar tarea",
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                //DBAdmin.db.insertRawTask();
-                DBAdmin.db.deleteTask();
-              },
-              child: Text(
-                "Eliminar tarea",
-              ),
-            ),
-          ],
-        ),
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
