@@ -39,25 +39,25 @@ class DBAdmin {
     );
   }
 
-  insertRawTask() async {
+  Future<int> insertRawTask(TaskModel model) async {
     Database? db = await checkDatabase();
-    int rest = await db!.rawInsert(
-      "INSERT INTO TASK(title, description, status) VALUES ('Ir de compras','comprar para la semana al mercado','false')",
+    int res = await db!.rawInsert(
+      "INSERT INTO TASK(title, description, status) VALUES ('${model.title}','${model.description}','${model.status.toString()}')",
     );
-    print(rest);
+    return res;
   }
 
-  insertTask() async {
+  Future<int> insertTask(TaskModel model) async {
     Database? db = await checkDatabase();
     int res = await db!.insert(
       "TASK",
       {
-        "title": "COmprar nuevo disco",
-        "description": "Nuevo disco de metallica",
-        "status": "ture",
+        "title": model.title,
+        "description": model.description,
+        "status": model.status,
       },
     );
-    print(res);
+    return res;
   }
 
   getRawTask() async {
