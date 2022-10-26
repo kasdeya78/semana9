@@ -6,6 +6,8 @@ import 'package:sqflite/sqflite.dart';
 
 import 'package:sqflite/sqflite.dart';
 
+import '../models/task_model.dart';
+
 class DBAdmin {
   Database? myDatabase;
 
@@ -64,10 +66,20 @@ class DBAdmin {
     print(tasks);
   }
 
-  Future<List<Map<String, dynamic>>> getTask() async {
+  Future<List<TaskModel>> getTask() async {
     Database? db = await checkDatabase();
     List<Map<String, dynamic>> tasks = await db!.query("Task");
-    return tasks;
+    List<TaskModel> taskModelList =
+        tasks.map((e) => TaskModel.deMapModel(e)).toList();
+
+    // tasks.forEach(
+    //   (element) {
+    //     TaskModel task = TaskModel.deMapModel(element);
+    //     taskModelList.add(task);
+    //   },
+    // );
+    print(taskModelList);
+    return taskModelList;
   }
 
   updateRawTask() async {
