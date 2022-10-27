@@ -19,7 +19,10 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context) {
         return MyFormWidget();
       },
-    );
+    ).then((value) {
+      print("Formulario cerrado");
+      setState(() {});
+    });
   }
 
   @override

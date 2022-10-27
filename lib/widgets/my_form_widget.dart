@@ -14,87 +14,136 @@ class _MyFormWidgetState extends State<MyFormWidget> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-  addTask() {
-    TaskModel taskModel = TaskModel(
-        title: _titleController.text,
-        description: _descriptionController.text,
-        status: isFinished.toString());
+  final _formKey = GlobalKey<FormState>();
 
-    DBAdmin.db.insertTask(taskModel);
+  addTask() {
+    if (_formKey.currentState!.validate()) {
+      TaskModel taskModel = TaskModel(
+          title: _titleController.text,
+          description: _descriptionController.text,
+          status: isFinished.toString());
+
+      DBAdmin.db.insertTask(taskModel).then(
+        (value) {
+          if (value > 0) {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.amberAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                duration: Duration(
+                  milliseconds: 1400,
+                ),
+                behavior: SnackBarBehavior.floating,
+                content: Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      color: Colors.white,
+                    ),
+                    Text(
+                      "Tarea registrada con exito",
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          ;
+        },
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text("Agregar tarea"),
-          TextField(
-            controller: _titleController,
-            decoration: InputDecoration(
-              hintText: "Titulo",
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Agregar tarea"),
+            TextFormField(
+              controller: _titleController,
+              decoration: InputDecoration(
+                hintText: "Titulo",
+              ),
+              validator: (String? value) {
+                if (value!.isEmpty) {
+                  return "El campo es obligatorio";
+                }
+                return null;
+              },
             ),
-          ),
-          const SizedBox(
-            height: 6.0,
-          ),
-          TextField(
-            controller: _descriptionController,
-            maxLines: 2,
-            decoration: InputDecoration(
-              hintText: "Descripcion",
+            const SizedBox(
+              height: 6.0,
             ),
-          ),
-          const SizedBox(
-            height: 6.0,
-          ),
-          Row(
-            children: [
-              const Text(
-                "Estado: ",
+            TextFormField(
+              controller: _descriptionController,
+              maxLines: 2,
+              decoration: InputDecoration(
+                hintText: "Descripcion",
               ),
-              const SizedBox(
-                width: 6.0,
-              ),
-              Checkbox(
-                value: isFinished,
-                onChanged: (value) {
-                  isFinished = value!;
-                  setState(() {});
-                },
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 6.0,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  "Cancelar",
+              validator: (String? value) {
+                if (value!.isEmpty) {
+                  return "El campo es obligatorio";
+                }
+                return null;
+              },
+            ),
+            const SizedBox(
+              height: 6.0,
+            ),
+            Row(
+              children: [
+                const Text(
+                  "Estado: ",
                 ),
-              ),
-              SizedBox(
-                width: 6.0,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  addTask();
-                  DBAdmin.db.getRawTask();
-                },
-                child: Text(
-                  "Aceptar",
+                const SizedBox(
+                  width: 6.0,
                 ),
-              ),
-            ],
-          )
-        ],
+                Checkbox(
+                  value: isFinished,
+                  onChanged: (value) {
+                    isFinished = value!;
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 6.0,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Cancelar",
+                  ),
+                ),
+                SizedBox(
+                  width: 6.0,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    addTask();
+                    DBAdmin.db.getRawTask();
+                  },
+                  child: Text(
+                    "Aceptar",
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
