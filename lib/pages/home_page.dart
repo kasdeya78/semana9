@@ -25,6 +25,31 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  deleteTask(int taskId) {
+    DBAdmin.db.deleteTask(taskId).then(
+      (value) {
+        if (value > 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.white,
+                  ),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Text("Tarea eliminada"),
+                ],
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,11 +72,24 @@ class _HomePageState extends State<HomePage> {
             return ListView.builder(
               itemCount: myTask.length,
               itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text(myTask[index].title),
-                  subtitle: Text(myTask[index].description),
-                  trailing: Text(
-                    myTask[index].id.toString(),
+                return Dismissible(
+                  key: UniqueKey(),
+                  confirmDismiss: (DismissDirection direction) async {
+                    return true;
+                  },
+                  direction: DismissDirection.startToEnd,
+                  background: Container(
+                    color: Colors.redAccent,
+                  ),
+                  onDismissed: (DismissDirection direction) {
+                    deleteTask(myTask[index].id!);
+                  },
+                  child: ListTile(
+                    title: Text(myTask[index].title),
+                    subtitle: Text(myTask[index].description),
+                    trailing: Text(
+                      myTask[index].id.toString(),
+                    ),
                   ),
                 );
               },
